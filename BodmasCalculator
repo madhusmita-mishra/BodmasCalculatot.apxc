@@ -1,0 +1,94 @@
+public class ScientificCalculators {
+ public static void finalcalculation(List<Calculator__c> cal) {
+     if(cal != null && cal.size() > 0){
+         for(Calculator__c cl : cal){
+             String results = cl.Calculate__c;
+              cl.Result__c = Integer.valueOf(findValueInBraces(results));
+         }
+     }
+ }
+     public static String findValueInBraces(String finalStr) {
+
+       while (finalStr.contains('(') && finalStr.contains(')')) {
+
+            integer fIndex = finalStr.indexOf('(');
+            integer nIndex = finalStr.indexOf(')');
+            String subString = finalStr.substring(fIndex + 1, nIndex);
+
+            finalStr = finalStr.substring(0, fIndex) + calculate(subString) + finalStr.substring(nIndex +1, finalStr.length());
+        }
+        return calculate(finalStr);
+
+    }
+    
+    public static String calculate(String finalString) {
+
+        while (finalString.contains('(') && finalString.contains(')')) {
+            findValueInBraces(finalString);
+        }
+        while (!isNum(finalString)) {
+            List<Integer> positions = getOperandPosition(finalString);
+            Integer pos = positions.get(0);
+            if (positions.size() >= 2 && positions.get(1) != null) {
+                Integer nxtPos = positions.get(1);
+                finalString = getValue(finalString.substring(0, nxtPos), pos)
+                        + finalString.substring(nxtPos, finalString.length());
+            } else {
+                finalString = getValue(
+                        finalString.substring(0, finalString.length()), pos);
+            }
+        }
+        return finalString;
+
+    }
+     public static boolean isNum(String str) {
+        if (str.contains('+') || str.contains('-') || str.contains('*')
+                || str.contains('/')) {
+            return false;
+        }
+        return true;
+    }
+     public static List<Integer> getOperandPosition(String str) {
+
+        List<Integer> integers = new List<Integer>();
+
+        if (str.contains('+')) {
+            integers.add(str.indexOf('+'));
+        }
+
+        if (str.contains('-')) {
+            integers.add(str.indexOf('-'));
+        }
+
+        if (str.contains('*')) {
+            integers.add(str.indexOf('*'));
+        }
+
+        if (str.contains('/')) {
+            integers.add(str.indexOf('/'));
+        }
+        //integers = integers.sort();
+        //Collections.sort(integers);
+        return integers;
+    }
+     public static String getValue(String str, Integer pos) {
+        double finalVal = 0;
+        System.debug('str-->'+str);
+        System.debug('pos-->'+pos);
+        //Integer c = str.charAt(pos);
+        double a = Double.valueOf(str.substring(0, pos));
+        double b = Double.valueOf(str.substring(pos + 1, str.length()));
+        Integer c = str.charAt(pos);
+
+        if (c == 42) {
+            finalVal = a * b;
+        } else if (c == 47) {
+            finalVal = a / b;
+        } else if (c == 43) { 
+            finalVal = a + b;
+        } else if (c == 45) {
+            finalVal = a - b;
+        }
+        return String.valueOf(finalVal);
+    }
+}
